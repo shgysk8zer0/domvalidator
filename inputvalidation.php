@@ -19,16 +19,21 @@ trait InputValidation
 		$opts = ['options' => []];
 
 		switch (strtolower($type)) {
-			case 'text':
-			case 'password':
-			case 'search':
-			case 'hidden':
-				return $this->validLength($input, $value) and $this->matchesPattern($input, $value);
-				break;
+			// case 'text':
+			// case 'password':
+			// case 'search':
+			// case 'hidden':
+			// 	return $this->validLength($input, $value) and $this->matchesPattern($input, $value);
+			// 	break;
 
 			case 'button':
 			case 'submit':
 			case 'reset':
+			case 'checkbox':
+				return true;
+				break;
+
+			case 'radio':
 				return true;
 				break;
 
@@ -77,9 +82,43 @@ trait InputValidation
 				break;
 
 			default:
-				return true;
+				return $this->readonlyValueMatch($input, $value)
+					and $this->validLength($input, $value)
+					and $this->matchesPattern($input, $value);
 				break;
 		}
+	}
+
+	/**
+	 * [isValidSelectOption description]
+	 * @param  DOMElement $select [description]
+	 * @param  [type]     $value  [description]
+	 * @return boolean            [description]
+	 * @todo Make work with optgroups
+	 */
+	final public function isValidSelect(\DOMElement $select, $value)
+	{
+		$options = $select->childNodes;
+		foreach($options as $option) {
+			$check = $option->hasAttribute('value')
+				? $option->getAttribute('value')
+				: $option->textContent;
+			if ($check === $value) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * [isInvalidSelect description]
+	 * @param  DOMElement $select [description]
+	 * @param  [type]     $value  [description]
+	 * @return boolean            [description]
+	 */
+	final public function isInvalidSelect(\DOMElement $select, $value)
+	{
+		return ! $this->isValidSelect($select, $value);
 	}
 
 
@@ -107,6 +146,31 @@ trait InputValidation
 	final public function isInvalidInput(\DOMElement $input, $value)
 	{
 		return ! $this->isValidInput($input, $value);
+	}
+
+
+	/**
+	 * [isInvaidTextarea description]
+	 * @param  DOMElement $textarea [description]
+	 * @param  [type]     $value    [description]
+	 * @return boolean              [description]
+	 */
+	final public function isInvaidTextarea(\DOMElement $textarea, $value)
+	{
+		return ! $this->isValidTextarea($textarea, $value);
+	}
+
+	/**
+	 * [isValidTextarea description]
+	 * @param  DOMElement $textarea [description]
+	 * @param  [type]     $value    [description]
+	 * @return boolean              [description]
+	 */
+	final public function isValidTextarea(\DOMElement $textarea, $value)
+	{
+		return $this->readonlyValueMatch($textarea, $value)
+			and $this->validLength($textarea, $value)
+			and ! $this->missingRequiredInput($textarea, $value);
 	}
 
 	/**
@@ -157,6 +221,17 @@ trait InputValidation
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * [readonlyValueMatch description]
+	 * @param  DOMElement $input [description]
+	 * @param  [type]     $value [description]
+	 * @return [type]            [description]
+	 */
+	final public function readonlyValueMatch(\DOMElement $input, $value)
+	{
+		return ! $input->hasAttribute('readonly') or $input->getAttribute('value') === $value;
 	}
 
 	/**
