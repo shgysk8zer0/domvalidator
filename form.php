@@ -8,9 +8,8 @@ final class Form
 {
 	use InputValidation;
 	public $is_valid = true;
-	public $submitted = [];
-	public $inputs = [];
-	private $_selectors = array('input', 'select', 'textarea');
+	private $_submitted = [];
+	private $_form;
 	private $_invalid_inputs = array();
 
 	/**
@@ -20,8 +19,7 @@ final class Form
 	 */
 	public function __construct(\DOMElement $form, Array $submitted)
 	{
-		$xpath = new \DOMXPath($form->ownerDocument);
-		$this->inputs = $xpath->query('input', $form);
+		$this->_form = $form;
 		$this->submitted = $this->_getInputNames($submitted);
 	}
 
@@ -31,7 +29,27 @@ final class Form
 	 */
 	public function __toString()
 	{
-		return json_encode($this->_validate());
+		return json_encode($this->_validateForm());
+	}
+
+	/**
+	 * [__get description]
+	 * @param  [type] $name [description]
+	 * @return [type]       [description]
+	 */
+	public function __get($name)
+	{
+		return $this->_submitted[$name];
+	}
+
+	/**
+	 * [__isset description]
+	 * @param  [type]  $name [description]
+	 * @return boolean       [description]
+	 */
+	public function __isset($name)
+	{
+		return array_key_exists($name, $this->_submitted);
 	}
 
 	/**
@@ -40,7 +58,7 @@ final class Form
 	 */
 	public function __invoke()
 	{
-		return $this->_validate();
+		return $this->_validateForm();
 	}
 
 	/**
@@ -52,7 +70,7 @@ final class Form
 	{
 		$uploaded = array_map(function($file)
 		{
-			return $file['name'];
+			return $file['tmp_name'];
 		}, $_FILES);
 		return array_merge($inputs, $uploaded);
 	}
@@ -66,8 +84,7 @@ final class Form
 	public static function validate(\DOMElement $form, Array $submitted)
 	{
 		$validator = new self($form, $submitted);
-		$validator();
-		return $validator->is_valid;
+		return $validator();
 	}
 
 	/**
@@ -119,13 +136,30 @@ final class Form
 	 * [_validate description]
 	 * @return [type] [description]
 	 */
-	private function _validate()
+	private function _validateForm()
 	{
-		foreach($this->inputs as $input) {
+		$inputs = $this->_form->getElementsByTagName('input');
+		$selects = $this->_form->getElementsByTagName('select');
+		$textareas = $this->_form->getElementsByTagName('textarea');
+
+		foreach($inputs as $input) {
 			if ($this->isInvalidInput($input, $this->submitted[$input->getAttribute('name')])) {
 				array_push($this->_invalid_inputs, $input->getAttribute('name'));
 			}
 		}
+
+		foreach ($selects as $select) {
+			if ($this->isInvalidSelect($select, $this->submitted[$select->getAttribute('name')])) {
+				array_push($this->_invalid_inputs, $select->getAttribute('name'));
+			}
+		}
+
+		foreach ($textareas as $textarea) {
+			if ($this->isInvaidTextarea($textarea, $this->submitted[$textarea->getAttribute('name')])) {
+				array_push($this->_invalid_inputs, $textarea->getAttribute('name'));
+			}
+		}
+
 		$this->is_valid = empty($this->_invalid_inputs);
 		return $this->_invalid_inputs;
 	}
