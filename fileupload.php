@@ -6,10 +6,6 @@ trait FileUpload
 	private static $_fkeys = array('error', 'name', 'size', 'tmp_name', 'type');
 	final public static function getUploadedFiles()
 	{
-		return array_filter($_FILES, function($file)
-		{
-			return !preg_match('/image\/jpeg/', $file['type']);
-		});
 		return ['post' => $_POST, 'files' => $_FILES];
 		$files = array_reduce(
 			$_FILES,
