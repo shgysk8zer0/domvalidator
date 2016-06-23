@@ -1,5 +1,5 @@
 <?php
-// namespace shgysk8zer0\DOMValidator;
+namespace shgysk8zer0\DOMValidator;
 trait InputValidation
 {
 	/**
