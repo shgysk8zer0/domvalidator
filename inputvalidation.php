@@ -39,14 +39,33 @@ trait InputValidation
 
 			case 'number':
 			case 'range':
+				if (! is_numeric($value)) {
+					return false;
+				} else {
+					$value = ctype_digit($value) ? intval($value) : floatval($value);
+				}
 				if ($input->hasAttribute('min') and is_numeric($input->getAttribute('min'))) {
 					$opts['options']['min_range'] = $input->getAttribute('min');
 				}
 				if ($input->hasAttribute('max') and is_numeric($input->getAttribute('max'))) {
 					$opts['options']['max_range'] = $input->getAttribute('max');
 				}
-				$step = $input->hasAttribute('step') and is_numeric($input->getAttribute('step')) ? $input->getAttribute('step') : 1;
-				return filter_var($value, FILTER_VALIDATE_INT, $opts);
+				if ($input->hasAttribute('step')) {
+					$step = $input->getAttribute('step');
+					if (is_numeric($step)) {
+						$step = ctype_digit($step) ? intval($step) : floatval($step);
+						if ($value % $step !== 0) {
+							return false;
+						}
+					} else {
+						trigger_error(
+							sprintf('Invalid step for %s in form %s.', $input->getAttribute('name'), ''),
+							\E_USER_ERROR
+						);
+					}
+				}
+
+				return filter_var($value, is_int($value) ? \FILTER_VALIDATE_INT : \FILTER_VALIDATE_FLOAT, $opts);
 				break;
 
 			case 'url':
@@ -199,7 +218,11 @@ trait InputValidation
 	final public function matchesPattern(\DOMElement $input, $value)
 	{
 		if ($input->hasAttribute('pattern')) {
-			return preg_match("/{$input->getAttribute('pattern')}/", $value);
+			$pattern = trim($input->getAttribute('pattern'), '/');
+			$pattern = ltrim($pattern, '^');
+			$pattern = rtrim($pattern, '$');
+			$pattern = "/^{$pattern}$/";
+			return preg_match($pattern, $value);
 		} else {
 			return true;
 		}
