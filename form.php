@@ -7,7 +7,6 @@ namespace shgysk8zer0\DOMValidator;
 final class Form
 {
 	use InputValidation;
-	use FileUpload;
 
 	public $is_valid = true;
 	private $_submitted = [];
