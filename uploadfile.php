@@ -17,9 +17,15 @@ final class UploadFile
 
 	public function __construct(Array $file)
 	{
-		if ($this->isUploadedFile($file)) {
-			$this->_data = $file;
-			$this->_path = $this->tmp_name;
+		try {
+			if (UploadFileError::checkFile($file)) {
+				$this->_data = $file;
+				$this->_path = $this->tmp_name;
+			}
+		} catch (UploadFileError $e) {
+			exit($e);
+		} catch (\Exception $e) {
+			exit($e);
 		}
 	}
 
