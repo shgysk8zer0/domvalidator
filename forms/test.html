@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>DOMValidator Test</title>
+		<meta charset="UTF-8" />
+		<script>
+			window.addEventListener('load', load => {
+				document.forms.test.addEventListener('submit', submit => {
+					submit.preventDefault();
+					let url = new URL(submit.target.action, location.href);
+					let body = new FormData(submit.target);
+					let headers = new Headers();
+					fetch(url, {
+						method: 'POST',
+						body,
+						headers
+					}).then(resp => {
+						if (resp.ok) {
+							return resp.json();
+						} else {
+							throw new Error(`<${resp.url}> ${resp.statusText}`);
+						}
+					}).then(json => {
+						console.log(json);
+					}).catch(error => {
+						console.error(error);
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<form name="test" action="./" method="POST">
+			<input type="hidden" name="form" value="test"/>
+			<input type="text" name="test[text]" pattern="[\w ]+" placeholder="Normal text" autofocus required />
+			<br />
+			<input type="file" name="test[file][1]" accept="image/*" />
+			<input type="file" name="file" accept="image/*" />
+			<br />
+			<button type="submit">Submit</button>
+			<button type="reset">Reset</button>
+		</form>
+	</body>
+</html>
