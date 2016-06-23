@@ -131,19 +131,19 @@ final class Form
 		$textareas = $this->_form->getElementsByTagName('textarea');
 
 		foreach($inputs as $input) {
-			if ($this->isInvalidInput($input, $this->submitted[$input->getAttribute('name')])) {
+			if ($this->isInvalidInput($input, $this->_submitted[$input->getAttribute('name')])) {
 				array_push($this->_invalid_inputs, $input->getAttribute('name'));
 			}
 		}
 
 		foreach ($selects as $select) {
-			if ($this->isInvalidSelect($select, $this->submitted[$select->getAttribute('name')])) {
+			if ($this->isInvalidSelect($select, $this->_submitted[$select->getAttribute('name')])) {
 				array_push($this->_invalid_inputs, $select->getAttribute('name'));
 			}
 		}
 
 		foreach ($textareas as $textarea) {
-			if ($this->isInvaidTextarea($textarea, $this->submitted[$textarea->getAttribute('name')])) {
+			if ($this->isInvaidTextarea($textarea, $this->_submitted[$textarea->getAttribute('name')])) {
 				array_push($this->_invalid_inputs, $textarea->getAttribute('name'));
 			}
 		}
