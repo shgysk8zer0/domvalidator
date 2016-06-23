@@ -13,7 +13,7 @@ if (empty($_REQUEST['form'])) {
 	exit($dom->saveHTML());
 } elseif (file_exists("./forms/{$_REQUEST['form']}.html")) {
 	header('Content-Type: application/json');
-	exit(json_encode(Form::getUploadedFiles()));
+	exit(json_encode(Form::getFiles($_FILES)));
 	$validator = new Form($dom->getElementsByTagName('form')->item(0), Form::getUploadedFiles($_REQUEST));
 	exit(json_encode(['_files' => $_FILES, '_REQUEST' => $_REQUEST, 'validator' => $validator]));
 }
