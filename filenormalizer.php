@@ -30,7 +30,7 @@ trait FileNormalizer
 		$ret = array();
 		foreach ($arr as $k => $v) {
 			if (is_array($v)) {
-				$ret[$k] = \call_user_func(__METHOD__, $v, $fileInfokey);
+				$ret[$k] = \call_user_func("self::". __FUNCTION__, $v, $fileInfokey);
 			} else {
 				$ret[$k][$fileInfokey] = $v;
 			}
