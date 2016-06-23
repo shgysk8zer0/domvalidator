@@ -1,12 +1,14 @@
 <?php
 
-// namespace shgysk8zer0\DOMValidator;
+namespace shgysk8zer0\DOMValidator;
 /**
  * @todo Check for additional inputs and allow for required additional ones.
  */
 final class Form
 {
 	use InputValidation;
+	use FileUpload;
+
 	public $is_valid = true;
 	private $_submitted = [];
 	private $_form;
@@ -20,7 +22,7 @@ final class Form
 	public function __construct(\DOMElement $form, Array $submitted)
 	{
 		$this->_form = $form;
-		$this->submitted = $this->_getInputNames($submitted);
+		$this->_submitted = static::_getInputNames($submitted);
 	}
 
 	/**
@@ -66,14 +68,19 @@ final class Form
 	 * @param  Array  $inputs [description]
 	 * @return [type]         [description]
 	 */
-	public static function getUploadedFiles(Array $inputs)
-	{
-		$uploaded = array_map(function($file)
-		{
-			return $file['tmp_name'];
-		}, $_FILES);
-		return array_merge($inputs, $uploaded);
-	}
+#	public static function getUploadedFilesq(Array $inputs = array())
+#	{
+#		foreach($_FILES as $key => $value) {
+#			$inputs[$key] = (object)$value;
+#		}
+#		return $inputs;
+#		/*$uploaded = array_map(function($file)
+#		{
+#			return [$file['name'] => (object)$file];
+#		}, $_FILES);
+#		return array_merge($inputs, $uploaded);
+#		*/
+#	}
 
 	/**
 	 * Static method to validate a form
@@ -121,7 +128,7 @@ final class Form
 	 * @param  Array  $inputs [description]
 	 * @return [type]         [description]
 	 */
-	private function _getInputNames(Array $inputs)
+	private static function _getInputNames(Array $inputs)
 	{
 		$inputs = urldecode(http_build_query($inputs));
 		$inputs = explode('&', $inputs);
