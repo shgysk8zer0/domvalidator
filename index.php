@@ -5,7 +5,7 @@ use \shgysk8zer0\Core\Console as Console;
 error_reporting(\E_ALL);
 
 spl_autoload_register('spl_autoload');
-set_include_path(dirname(__DIR__, 2));
+set_include_path(dirname(dirname(__DIR__)));
 
 set_error_handler(function(...$args)
 {
