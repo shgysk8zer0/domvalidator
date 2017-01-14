@@ -67,6 +67,9 @@ trait Filters
 				$this->filterColor($value);
 				break;
 
+			case 'file':
+				break;
+
 			default:
 				$this->type = 'text';
 				$value = $this->validate($value);

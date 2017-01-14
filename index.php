@@ -7,7 +7,7 @@ error_reporting(\E_ALL);
 spl_autoload_register('spl_autoload');
 set_include_path(dirname(__DIR__, 2));
 
-/*set_error_handler(function(...$args)
+set_error_handler(function(...$args)
 {
 	header('Content-Type: application/json');
 	echo json_encode($args);
@@ -22,7 +22,7 @@ set_exception_handler(function($e) {
 		'line'    => $e->getLine(),
 		'trace'   => $e->getTrace(),
 	]);
-});*/
+});
 
 
 if (empty($_REQUEST)) {
@@ -32,6 +32,9 @@ if (empty($_REQUEST)) {
 	$form = Form::loadFromFile('forms/test.html');
 	header('Content-Type: application/json');
 	$filtered = $form($_REQUEST);
-	Console::log($_REQUEST)->sendLogHeader();
+	Console::log([
+		'$_REQUEST' => $_REQUEST,
+		'$_FILES' => $_FILES,
+	])->sendLogHeader();
 	echo json_encode($filtered);
 }
