@@ -184,7 +184,7 @@ trait Filters
 	final protected function filterDateTime(&$value)
 	{
 		try {
-			$pattern = new Pattern(Consts::PATTERNS['date'] . '[T ]' . Consts::PATTERNS['time']);
+			$pattern = new Pattern(Consts::PATTERNS['datetime']);
 			if ($pattern($value)) {
 				$date = new \DateTime($value);
 				$value = $date->format(\DateTime::W3C);
@@ -200,7 +200,6 @@ trait Filters
 					$value = false;
 				}
 			} else {
-				Console::error("$value does not match $pattern");
 				$value = false;
 			}
 		} catch (\Exception $e) {
