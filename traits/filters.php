@@ -56,9 +56,11 @@ trait Filters
 				break;
 
 			case 'week':
+				$this->filterWeek($value);
 				break;
 
 			case 'month':
+				$this->filterMonth($value);
 				break;
 
 			case 'color':
@@ -178,9 +180,39 @@ trait Filters
 				$value = false;
 			}
 		} catch(\Exception $e) {
+			$value = false;
 			Console::error($e);
 		}
 	}
+
+	final protected function filterMonth(&$value)
+	{
+		try {
+			$pattern = new Pattern(Consts::PATTERNS['month']);
+			if ($pattern($value)) {
+				$month = new \DateTime($value);
+				$value = $month->format('Y-m');
+				return;
+				$min = $max = null;
+				if (isset($this->min) and $pattern($this->min)) {
+					$min = new \DateTime($this->min);
+				}
+				if (isset($this->max) and $pattern($this->max)) {
+					$max = new \DateTime($this->max);
+				}
+				if ((isset($min) and $month < $min) or (isset($max) and $month > $max)) {
+					$value = false;
+				}
+			} else {
+				Console::error("$value is not in a valid month format");
+				$value = false;
+			}
+		} catch(\Exception $e) {
+			$value = false;
+			Console::error($e);
+		}
+	}
+
 	final protected function filterDateTime(&$value)
 	{
 		try {
@@ -197,6 +229,32 @@ trait Filters
 					$max = new \DateTime($this->max);
 				}
 				if ((isset($min) and $date < $min) or (isset($max) and $date > $max)) {
+					$value = false;
+				}
+			} else {
+				$value = false;
+			}
+		} catch (\Exception $e) {
+			$value = false;
+		}
+	}
+
+	final protected function filterWeek(&$value)
+	{
+		try {
+			$pattern = new Pattern(Consts::PATTERNS['week']);
+			if ($pattern($value)) {
+				$week = new \DateTime($value);
+				$value = $week->format('Y-\WW');
+				$min = $max = null;
+
+				if (isset($this->min) and $pattern($this->min)) {
+					$min = new \DateTime($this->min);
+				}
+				if (isset($this->max) and $pattern($this->max)) {
+					$max = new \DateTime($this->max);
+				}
+				if ((isset($min) and $week < $min) or (isset($max) and $week > $max)) {
 					$value = false;
 				}
 			} else {
